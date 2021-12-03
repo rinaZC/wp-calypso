@@ -22,22 +22,6 @@ Undocumented.prototype.jetpackIsUserConnected = function ( siteId ) {
 };
 
 /**
- * Get the inbound transfer status for this domain
- *
- * @param {string} domain - The domain name to check.
- * @param {string} authCode - The auth code for the given domain to check.
- * @param {Function} fn The callback function
- * @returns {Promise} A promise that resolves when the request completes
- */
-Undocumented.prototype.checkAuthCode = function ( domain, authCode, fn ) {
-	return this.wpcom.req.get(
-		`/domains/${ encodeURIComponent( domain ) }/inbound-transfer-check-auth-code`,
-		{ auth_code: authCode },
-		fn
-	);
-};
-
-/**
  * Starts an inbound domain transfer that is in the pending_start state.
  *
  * @param {number|string} siteId The site ID
