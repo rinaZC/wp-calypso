@@ -37,6 +37,7 @@ export function generateSteps( {
 	isSiteTypeFulfilled = noop,
 	isSiteTopicFulfilled = noop,
 	maybeRemoveStepForUserlessCheckout = noop,
+	excludeStepIfEmailVerified = noop,
 } = {} ) {
 	return {
 		survey: {
@@ -685,6 +686,7 @@ export function generateSteps( {
 
 		'p2-confirm-email': {
 			stepName: 'p2-confirm-email',
+			fulfilledStepCallback: excludeStepIfEmailVerified,
 		},
 
 		'plans-personal-monthly': {

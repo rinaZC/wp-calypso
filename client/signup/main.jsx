@@ -47,6 +47,7 @@ import {
 	getCurrentUser,
 	currentUserHasFlag,
 	getCurrentUserSiteCount,
+	isCurrentUserEmailVerified,
 } from 'calypso/state/current-user/selectors';
 import getCurrentLocaleSlug from 'calypso/state/selectors/get-current-locale-slug';
 import isDomainOnlySite from 'calypso/state/selectors/is-domain-only-site';
@@ -126,6 +127,7 @@ class Signup extends Component {
 		store: PropTypes.object.isRequired,
 		domainsWithPlansOnly: PropTypes.bool,
 		isLoggedIn: PropTypes.bool,
+		isEmailVerified: PropTypes.bool,
 		loadTrackingTool: PropTypes.func.isRequired,
 		setSurvey: PropTypes.func.isRequired,
 		submitSiteType: PropTypes.func.isRequired,
@@ -806,6 +808,7 @@ export default connect(
 			progress: getSignupProgress( state ),
 			signupDependencies,
 			isLoggedIn: isUserLoggedIn( state ),
+			isEmailVerified: isCurrentUserEmailVerified( state ),
 			isNewishUser: isUserRegistrationDaysWithinRange( state, null, 0, 7 ),
 			existingSiteCount: getCurrentUserSiteCount( state ),
 			isPaidPlan: isCurrentPlanPaid( state, siteId ),

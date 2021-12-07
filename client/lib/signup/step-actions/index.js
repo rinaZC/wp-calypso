@@ -909,6 +909,19 @@ export function maybeRemoveStepForUserlessCheckout( stepName, defaultDependencie
 	}
 }
 
+export function excludeStepIfEmailVerified( stepName, defaultDependencies, nextProps ) {
+	if ( includes( flows.excludedSteps, stepName ) ) {
+		return;
+	}
+
+	if ( ! nextProps.isEmailVerified ) {
+		return;
+	}
+
+	nextProps.submitSignupStep( { stepName, wasSkipped: true } );
+	flows.excludeStep( stepName );
+}
+
 export function isPlanFulfilled( stepName, defaultDependencies, nextProps ) {
 	const { isPaidPlan, sitePlanSlug, submitSignupStep } = nextProps;
 	let fulfilledDependencies = [];
