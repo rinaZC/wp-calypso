@@ -22,7 +22,7 @@ const handleCallback = ( currentStepIndex: number, callback?: Callback ) => {
 };
 
 const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
-	const [ popperReady, setPopperReady ] = useState( true );
+	const [ tourReady, setTourReady ] = useState( false );
 	const tourContainerRef = useRef( null );
 	const [ popperElement, sePopperElement ] = useState< HTMLElement | null >( null );
 	const [ initialFocusedElement, setInitialFocusedElement ] = useState< HTMLElement | null >(
@@ -43,8 +43,8 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 			return false;
 		}
 
-		return !! ( referenceElement && ! isMinimized );
-	}, [ config.options?.effects?.arrowIndicator, isMinimized, referenceElement ] );
+		return !! ( referenceElement && ! isMinimized && tourReady );
+	}, [ config.options?.effects?.arrowIndicator, isMinimized, referenceElement, tourReady ] );
 
 	const showSpotlight = useCallback( () => {
 		if ( ! config.options?.effects?.spotlight ) {
@@ -100,7 +100,7 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 	);
 
 	const stepRepositionProps =
-		! isMinimized && referenceElement && popperReady
+		! isMinimized && referenceElement && tourReady
 			? {
 					style: popperStyles?.popper,
 					...popperAttributes?.popper,
@@ -108,7 +108,7 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 			: null;
 
 	const arrowPositionProps =
-		! isMinimized && referenceElement && popperReady
+		! isMinimized && referenceElement && tourReady
 			? {
 					style: popperStyles?.arrow,
 					...popperAttributes?.arrow,
@@ -154,27 +154,36 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 		handleCallback( currentStepIndex, config.options?.callbacks?.onMaximize );
 	}, [ config.options?.callbacks?.onMaximize, currentStepIndex ] );
 
+	/*
+	 * Focus first interactive element when step renders.
+	 */
 	useEffect( () => {
-		/*
-		 * First interactive element when step renders
-		 */
 		setTimeout( () => initialFocusedElement?.focus() );
 	}, [ initialFocusedElement ] );
 
+	/*
+	 * Fixes issue with Popper misplacing the instance on mount
+	 * See: https://stackoverflow.com/questions/65585859/react-popper-incorrect-position-on-mount
+	 */
 	useEffect( () => {
-		/*
-		 * Fixes issue with Popper misplacing the instance on mount
-		 * See: https://stackoverflow.com/questions/65585859/react-popper-incorrect-position-on-mount
-		 */
-		if ( update ) {
-			setPopperReady( false );
-			update()
-				.then( () => setPopperReady( true ) )
-				.catch( () => setPopperReady( true ) );
+		// If no reference element to position step near
+		if ( ! referenceElement ) {
+			setTourReady( true );
+			return;
 		}
-	}, [ currentStepIndex, update ] );
 
-	const classNames = classnames( 'tour-kit-frame', config.options?.className );
+		setTourReady( false );
+
+		if ( update ) {
+			update()
+				.then( () => setTourReady( true ) )
+				.catch( () => setTourReady( true ) );
+		}
+	}, [ update, referenceElement ] );
+
+	const classNames = classnames( 'tour-kit-frame', config.options?.className, {
+		'--visible': tourReady,
+	} );
 
 	return (
 		<>
