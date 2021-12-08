@@ -75,18 +75,6 @@ Undocumented.prototype.startInboundTransfer = function ( siteId, domain, authCod
 	);
 };
 
-/**
- * Launches a private site
- *
- * @param {string} siteIdOrSlug - ID or slug of the site to be launched
- * @param {Function} fn - Function to invoke when request is complete
- */
-Undocumented.prototype.launchSite = function ( siteIdOrSlug, fn ) {
-	const path = `/sites/${ siteIdOrSlug }/launch`;
-	debug( path );
-	return this.wpcom.req.post( path, fn );
-};
-
 Undocumented.prototype.resendIcannVerification = function ( domain, callback ) {
 	return this.wpcom.req.post( '/domains/' + domain + '/resend-icann/', callback );
 };
