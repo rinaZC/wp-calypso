@@ -9,7 +9,7 @@ const requestTransferToAtomicStatus = ( action ) =>
 		{
 			apiNamespace: 'wpcom/v2',
 			method: 'GET',
-			path: `/sites/${ action.siteId }/atomic/transfers/`,
+			path: `/sites/${ action.siteId }/atomic/transfers/latest`,
 		},
 		action
 	);
@@ -19,7 +19,7 @@ export const receiveError = ( action, { error } ) => {
 };
 
 export const receiveResponse = ( action, { success } ) => {
-	setAtomicTransferStatus( action.siteId, action.softwareSet, success.applied );
+	setAtomicTransferStatus( action.siteId, action.softwareSet, success.status );
 };
 
 registerHandlers( 'state/data-layer/wpcom/sites/atomic-transfers/status', {
