@@ -22,7 +22,7 @@ const handleCallback = ( currentStepIndex: number, callback?: Callback ) => {
 };
 
 const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
-	const [ tourReady, setTourReady ] = useState( false );
+	const [ popperReady, setPopperReady ] = useState( true );
 	const tourContainerRef = useRef( null );
 	const [ popperElement, sePopperElement ] = useState< HTMLElement | null >( null );
 	const [ initialFocusedElement, setInitialFocusedElement ] = useState< HTMLElement | null >(
@@ -43,24 +43,24 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 			return false;
 		}
 
-		return !! ( referenceElement && ! isMinimized && tourReady );
-	}, [ config.options?.effects?.arrowIndicator, isMinimized, referenceElement, tourReady ] );
+		return !! ( referenceElement && ! isMinimized );
+	}, [ config.options?.effects?.arrowIndicator, isMinimized, referenceElement ] );
 
 	const showSpotlight = useCallback( () => {
 		if ( ! config.options?.effects?.spotlight ) {
 			return false;
 		}
 
-		return ! isMinimized && tourReady;
-	}, [ config.options?.effects?.spotlight, isMinimized, tourReady ] );
+		return ! isMinimized;
+	}, [ config.options?.effects?.spotlight, isMinimized ] );
 
 	const showOverlay = useCallback( () => {
 		if ( showSpotlight() || ! config.options?.effects?.overlay ) {
 			return false;
 		}
 
-		return ! isMinimized && tourReady;
-	}, [ config.options?.effects?.overlay, isMinimized, showSpotlight, tourReady ] );
+		return ! isMinimized;
+	}, [ config.options?.effects?.overlay, isMinimized, showSpotlight ] );
 
 	const { styles: popperStyles, attributes: popperAttributes, update } = usePopper(
 		referenceElement,
@@ -100,7 +100,7 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 	);
 
 	const stepRepositionProps =
-		! isMinimized && referenceElement
+		! isMinimized && referenceElement && popperReady
 			? {
 					style: popperStyles?.popper,
 					...popperAttributes?.popper,
@@ -108,7 +108,7 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 			: null;
 
 	const arrowPositionProps =
-		! isMinimized && referenceElement
+		! isMinimized && referenceElement && popperReady
 			? {
 					style: popperStyles?.arrow,
 					...popperAttributes?.arrow,
@@ -166,13 +166,15 @@ const TourKitFrame: React.FunctionComponent< Props > = ( { config } ) => {
 		 * Fixes issue with Popper misplacing the instance on mount
 		 * See: https://stackoverflow.com/questions/65585859/react-popper-incorrect-position-on-mount
 		 */
-		update && update();
-		setTimeout( () => setTourReady( true ) );
-	}, [ update ] );
+		if ( update ) {
+			setPopperReady( false );
+			update()
+				.then( () => setPopperReady( true ) )
+				.catch( () => setPopperReady( true ) );
+		}
+	}, [ currentStepIndex, update ] );
 
-	const classNames = classnames( 'tour-kit-frame', config.options?.className, {
-		'--visible': tourReady,
-	} );
+	const classNames = classnames( 'tour-kit-frame', config.options?.className );
 
 	return (
 		<>
