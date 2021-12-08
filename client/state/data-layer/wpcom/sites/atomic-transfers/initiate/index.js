@@ -40,6 +40,7 @@ export const receiveResponse = ( action ) => {
 		requestAtomicTransferStatus( action.siteId ),
 	];
 };
+
 registerHandlers( 'state/data-layer/wpcom/sites/atomic-transfers/initiate', {
 	[ ATOMIC_PLUGIN_INSTALL_INITIATE_WITH_TRANSFER ]: [
 		dispatchRequest( {
